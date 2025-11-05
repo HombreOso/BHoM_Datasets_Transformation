@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JsonToDictionary")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d2f9d62c9e340eb8fc86e2f8d69a6f1a55f643f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66ece3a10ad038a6905de4e1dda6b0f941ef77b9")]
 [assembly: System.Reflection.AssemblyProductAttribute("JsonToDictionary")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JsonToDictionary")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text;
 using BH.Engine;
+using BH.oM.PlantRoomSizer;
 
 internal static class Program
 {
@@ -42,15 +43,24 @@ internal static class Program
                 {
                     using var stream = File.OpenRead(filePath);
                     using var doc = JsonDocument.Parse(stream, jsonOptions);
-                    object? parsed = ConvertElement(doc.RootElement);
-                    fileNameToContent[Path.GetFileName(filePath)] = parsed;
+                    var series = ConvertToDataSeries(doc.RootElement);
+                    if (series is null || series.DataPoints == null || series.DataPoints.Count == 0)
+                    {
+                        Console.Error.WriteLine($"{Path.GetFileName(filePath)} does not contain a valid DataSeries (expected array of points or object with 'Data' array).");
+                        continue;
+                    }
+                    fileNameToContent[Path.GetFileName(filePath)] = series;
 
-                    // Serialize using BHoM Serializer (if available) and write to output folder
-                    string json = SerializeWithBHoMOrFallback(parsed);
+                    // Serialize using BHoM Serializer only and write to output folder
+                    if (!TrySerializeWithBHoM(series, out var json, out var serializeError))
+                    {
+                        Console.Error.WriteLine($"BHoM serialization failed for {Path.GetFileName(filePath)}: {serializeError}");
+                        continue;
+                    }
                     var outPath = Path.Combine(outputDir, Path.GetFileName(filePath));
                     File.WriteAllText(outPath, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
-                    Console.WriteLine($"Processed {Path.GetFileName(filePath)} -> root: {DescribeType(parsed)} -> saved: {Path.GetFileName(outPath)}");
+                    Console.WriteLine($"Processed {Path.GetFileName(filePath)} -> root: {DescribeType(series)} -> saved: {Path.GetFileName(outPath)}");
                 }
                 catch (Exception ex)
                 {
@@ -160,45 +170,114 @@ internal static class Program
         if (value is null) return "null";
         if (value is Dictionary<string, object?> d) return $"Dictionary<string, object?> (keys: {d.Count})";
         if (value is List<object?> l) return $"List<object?> (count: {l.Count})";
+        if (value is DataSeries ds && ds.DataPoints != null) return $"DataSeries (points: {ds.DataPoints.Count})";
         return value.GetType().Name;
     }
 
-    private static string SerializeWithBHoMOrFallback(object? obj)
+    private static CurvePoint? ConvertToCurvePoint(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+            {
+                double? x = null;
+                double? y = null;
+                foreach (var property in element.EnumerateObject())
+                {
+                    if (string.Equals(property.Name, "x", StringComparison.OrdinalIgnoreCase) || string.Equals(property.Name, "X", StringComparison.Ordinal))
+                    {
+                        if (TryGetDouble(property.Value, out var dx)) x = dx;
+                    }
+                    else if (string.Equals(property.Name, "y", StringComparison.OrdinalIgnoreCase) || string.Equals(property.Name, "Y", StringComparison.Ordinal))
+                    {
+                        if (TryGetDouble(property.Value, out var dy)) y = dy;
+                    }
+                }
+                if (x.HasValue && y.HasValue)
+                    return new CurvePoint { X = x.Value, Y = y.Value };
+                return null;
+            }
+
+            case JsonValueKind.Array:
+            {
+                var enumerated = element.EnumerateArray().ToList();
+                if (enumerated.Count == 2 && TryGetDouble(enumerated[0], out var ax) && TryGetDouble(enumerated[1], out var ay))
+                    return new CurvePoint { X = ax, Y = ay };
+                return null;
+            }
+
+            default:
+                return null;
+        }
+    }
+
+    private static bool TryGetDouble(JsonElement element, out double value)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Number:
+                return element.TryGetDouble(out value);
+            case JsonValueKind.String:
+            {
+                var s = element.GetString();
+                return double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value)
+                    || double.TryParse(s, out value);
+            }
+            default:
+                value = default;
+                return false;
+        }
+    }
+
+    private static DataSeries? ConvertToDataSeries(JsonElement root)
+    {
+        // Accept either a root array of points, or an object with a Data array
+        if (root.ValueKind == JsonValueKind.Array)
+        {
+            var list = new List<CurvePoint>();
+            foreach (var item in root.EnumerateArray())
+            {
+                var p = ConvertToCurvePoint(item);
+                if (p != null) list.Add(p);
+            }
+            return list.Count > 0 ? new DataSeries { DataPoints = list } : null;
+        }
+
+        if (root.ValueKind == JsonValueKind.Object)
+        {
+            // Prefer a "Data" array if present
+            if (root.TryGetProperty("Data", out var dataElement) && dataElement.ValueKind == JsonValueKind.Array)
+            {
+                var list = new List<CurvePoint>();
+                foreach (var item in dataElement.EnumerateArray())
+                {
+                    var p = ConvertToCurvePoint(item);
+                    if (p != null) list.Add(p);
+                }
+                return list.Count > 0 ? new DataSeries { DataPoints = list } : null;
+            }
+
+            // If not a collection, try to parse the object itself as a single point
+            var single = ConvertToCurvePoint(root);
+            if (single != null) return new DataSeries { DataPoints = new List<CurvePoint> { single } };
+        }
+
+        return null;
+    }
+
+    private static bool TrySerializeWithBHoM(object? obj, out string json, out string error)
     {
         try
         {
-            // Try to find BH.Engine.Serialiser.Convert.ToJson via reflection
-            var convertType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a =>
-                {
-                    try { return a.GetTypes(); } catch { return Array.Empty<Type>(); }
-                })
-                .FirstOrDefault(t => string.Equals(t.FullName, "BH.Engine.Serialiser.Convert", StringComparison.Ordinal));
-
-            if (convertType != null)
-            {
-                var toJson = convertType.GetMethod("ToJson", new[] { typeof(object) });
-                if (toJson != null)
-                {
-                    var result = toJson.Invoke(null, new[] { obj });
-                    if (result is string s)
-                        return s;
-                }
-            }
+            json = BH.Engine.Serialiser.Convert.ToJson(obj);
+            error = string.Empty;
+            return true;
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore and fallback below
+            json = string.Empty;
+            error = ex.Message;
+            return false;
         }
-
-        // Fallback to System.Text.Json if BHoM is unavailable at runtime
-
-        try {
-            return BH.Engine.Serialiser.Convert.ToJson(obj);
-        } catch {
-            // ignore and fallback below
-        }
-
-        return JsonSerializer.Serialize(obj);
     }
 }
