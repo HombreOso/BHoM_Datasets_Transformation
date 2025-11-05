@@ -1,1 +1,2 @@
-[{"x":"100","y":"3.978678038379531"},{"x":"4781.125639567936","y":"9.505330490405116"}]
+[{ "_t" : "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]", "x" : "100", "y" : "3.978678038379531", "_bhomVersion" : "6.3" },
+{ "_t" : "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]", "x" : "4781.125639567936", "y" : "9.505330490405116", "_bhomVersion" : "6.3" }]

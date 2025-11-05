@@ -1,1 +1,53 @@
-[{"x":"50","y":"22.88"},{"x":"100","y":"29.07"},{"x":"200","y":"40.00"},{"x":"500","y":"60.00"},{"x":"1000","y":"78.53"}]
+{
+  "_t": "BH.oM.Data.Library.Dataset",
+  "SourceInformation": {
+    "_t": "BH.oM.Data.Library.Source",
+    "SourceLink": "",
+    "Title": "",
+    "Author": "",
+    "ItemReference": "",
+    "Version": "",
+    "Publisher": "",
+    "Schema": "",
+    "Language": "",
+    "Location": "",
+    "Copyright": "",
+    "Contributors": "",
+    "Confidence": "High",
+    "BHoM_Guid": "a2dd308d-aa6d-4a18-826f-ce0180b83326",
+    "Name": ""
+  },
+  "TimeOfCreation": { "$date": 1762340995996 },
+  "Data": [
+    {
+      "_t": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+      "x": "50",
+      "y": "22.88",
+      "_bhomVersion": "6.3"
+    },
+    {
+      "_t": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+      "x": "100",
+      "y": "29.07",
+      "_bhomVersion": "6.3"
+    },
+    {
+      "_t": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+      "x": "200",
+      "y": "40.00",
+      "_bhomVersion": "6.3"
+    },
+    {
+      "_t": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+      "x": "500",
+      "y": "60.00",
+      "_bhomVersion": "6.3"
+    },
+    {
+      "_t": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+      "x": "1000",
+      "y": "78.53",
+      "_bhomVersion": "6.3"
+    }
+  ]
+}

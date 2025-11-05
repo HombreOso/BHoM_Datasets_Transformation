@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text;
+using BH.Engine;
 
 internal static class Program
 {
@@ -191,6 +192,13 @@ internal static class Program
         }
 
         // Fallback to System.Text.Json if BHoM is unavailable at runtime
+
+        try {
+            return BH.Engine.Serialiser.Convert.ToJson(obj);
+        } catch {
+            // ignore and fallback below
+        }
+
         return JsonSerializer.Serialize(obj);
     }
 }

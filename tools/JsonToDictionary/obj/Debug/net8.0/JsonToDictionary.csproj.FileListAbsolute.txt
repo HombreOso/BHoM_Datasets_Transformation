@@ -145,3 +145,4 @@ C:\GitHub\TransformDataSetsToBHoM\tools\JsonToDictionary\obj\Debug\net8.0\refint
 C:\GitHub\TransformDataSetsToBHoM\tools\JsonToDictionary\obj\Debug\net8.0\JsonToDictionary.pdb
 C:\GitHub\TransformDataSetsToBHoM\tools\JsonToDictionary\obj\Debug\net8.0\JsonToDictionary.genruntimeconfig.cache
 C:\GitHub\TransformDataSetsToBHoM\tools\JsonToDictionary\obj\Debug\net8.0\ref\JsonToDictionary.dll
+C:\GitHub\TransformDataSetsToBHoM\tools\JsonToDictionary\obj\Debug\net8.0\JsonToDictionary.sourcelink.json
